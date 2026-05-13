@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="es" translate="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>CONFÍN — Patagonia & Andes Australes</title>
+<meta name="description" content="Todo el sur en un solo lugar. Alojamientos, experiencias, gastronomía y comercios auténticos de la Patagonia.">
+<meta name="theme-color" content="#060E10">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,300;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════
+   VARIABLES & RESET
+═══════════════════════════════ */
+:root {
+  --cream:    #FAF8F5;
+  --stone:    #E8E2D9;
+  --ash:      #C4BAB0;
+  --bark:     #7A6E65;
+  --soil:     #3A3028;
+  --night:    #1C1915;
+  --deep:     #060E10;
+  --ember:    #B8673A;
+  --pine:     #3D5247;
+  --atl:      #3D6B73;
+  --atl-lt:   #5B9BAA;
+  --fog:      #F0EDE8;
+  --fd: 'Cormorant Garamond', Georgia, serif;
+  --fb: 'DM Sans', sans-serif;
+}
+*{ margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body{ height:100%; overflow:hidden; font-family:var(--fb); font-weight:300; background:var(--deep); color:var(--soil); }
+
+/* ═══════════════════════════════
+   VIEW SYSTEM
+═══════════════════════════════ */
+.view{
+  position:fixed; inset:0;
+  display:flex; flex-direction:column;
+  opacity:0; pointer-events:none;
+  transition: opacity 0.38s ease, transform 0.38s ease;
+  transform: translateX(24px);
+  overflow: hidden;
+}
+.view.active{ opacity:1; pointer-events:all; transform:translateX(0); }
+.view.exit{ opacity:0; transform:translateX(-24px); }
+.vscroll{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+.vscroll::-webkit-scrollbar{ display:none; }
+
+/* ═══════════════════════════════
+   SPLASH
+═══════════════════════════════ */
+#splash{
+  background: var(--deep);
+  align-items:center; justify-content:center;
+  opacity:1; pointer-events:all; transform:none;
+  z-index:999; flex-direction:column; padding:32px 20px;
+  transition: opacity 1.2s ease;
+}
+#splash-halo{
+  position:fixed; inset:0;
+  background: radial-gradient(ellipse at 50% 38%, rgba(61,107,115,0.28) 0%, transparent 62%);
+  opacity:0; pointer-events:none;
+  transition: opacity 2.5s ease;
+}
+#splash-logo-wrap{
+  position:relative; width:94%; max-width:500px;
+  margin-bottom:28px; opacity:0;
+  transition: opacity 1.8s ease, filter 1.8s ease;
+  filter: brightness(1.0);
+}
+#splash-logo-wrap.show{
+  opacity:1;
+  filter: brightness(2.2) contrast(0.86) saturate(0.8)
+          drop-shadow(0 0 28px rgba(140,210,225,0.65))
+          drop-shadow(0 0 55px rgba(61,107,115,0.45));
+}
+#splash-logo-wrap img{ width:100%; height:auto; display:block; mix-blend-mode:screen; }
+
+#splash-slogan{
+  opacity:0; transform:translateY(10px);
+  transition: opacity 1.2s ease, transform 1.2s ease;
+  text-align:center; margin-bottom:12px;
+}
+#splash-slogan p{
+  font-family:var(--fd);
+  font-size: clamp(1.8rem, 6vw, 2.6rem);
+  font-weight:400; font-style:italic;
+  color:rgba(250,248,245,0.96); line-height:1.15;
+}
+#splash-region{
+  opacity:0; transform:translateY(8px);
+  transition: opacity 1s ease, transform 1s ease;
+  margin-bottom:48px;
+}
+#splash-region p{
+  font-family:var(--fd);
+  font-size:1.1rem; font-style:italic; font-weight:300;
+  color:rgba(163,196,204,0.88); text-align:center;
+  letter-spacing:0.03em;
+}
+#splash-loading{
+  opacity:0; transition:opacity 0.8s ease; text-align:center;
+}
+#splash-loading .ln{ width:30px; height:1px; background:rgba(61,107,115,0.4); margin:0 auto 8px; }
+#splash-loading p{ font-size:0.55rem; letter-spacing:0.2em; text-transform:uppercase; color:rgba(196,186,176,0.3); }
+
+/* ═══════════════════════════════
+   DEMO BANNER
+═══════════════════════════════ */
+.demo-bar{
+  background:rgba(28,25,21,0.96); color:rgba(196,186,176,0.65);
+  text-align:center; padding:7px 16px;
+  font-size:0.58rem; letter-spacing:0.14em; text-transform:uppercase;
+  flex-shrink:0;
+}
+.demo-bar span{ color:var(--ember); }
+
+/* ═══════════════════════════════
+   NAV
+═══════════════════════════════ */
+.nav{
+  background:rgba(250,248,245,0.97); backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(196,186,176,0.22);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:13px 18px; flex-shrink:0; z-index:10;
+}
+.nav-logo img{ height:42px; width:auto; object-fit:contain; max-width:160px; display:block; }
+.nav-logo-text{
+  font-family:var(--fd); font-size:1.35rem; font-weight:400;
+  letter-spacing:0.12em; color:var(--night); line-height:1;
+}
+.nav-logo-text em{ font-style:italic; color:var(--atl); }
+.nav-r{ display:flex; align-items:center; gap:5px; }
+.lbtn{
+  background:none; border:1px solid var(--ash); padding:4px 7px;
+  font-size:0.6rem; letter-spacing:0.1em; cursor:pointer;
+  font-family:var(--fb); color:var(--bark); transition:all 0.2s;
+}
+.lbtn.on,.lbtn:hover{ background:var(--night); color:var(--cream); border-color:var(--night); }
+.fbtn{
+  background:none; border:1px solid var(--ash); padding:4px 6px;
+  font-size:0.68rem; cursor:pointer; font-family:var(--fb); color:var(--bark);
+}
+.back{
+  background:none; border:none; cursor:pointer;
+  display:flex; align-items:center; gap:6px;
+  font-size:0.74rem; letter-spacing:0.06em; color:var(--bark);
+  font-family:var(--fb); padding:4px 0;
+}
+.back span{ font-size:1.1rem; }
+
+/* ═══════════════════════════════
+   HERO
+═══════════════════════════════ */
+#view-hero{ background:var(--deep); }
+.hero-bg{
+  position:absolute; inset:0;
+  background:
+    radial-gradient(ellipse at 50% 48%, rgba(61,107,115,0.38) 0%, transparent 52%),
+    radial-gradient(ellipse at 20% 30%, rgba(61,107,115,0.22) 0%, transparent 45%),
+    radial-gradient(ellipse at 80% 20%, rgba(184,103,58,0.12) 0%, transparent 40%),
+    linear-gradient(170deg, #141A1C 0%, #1A2E32 40%, #182820 70%, #141A1C 100%);
+  animation: heroBreathe 14s ease-in-out infinite alternate;
+}
+@keyframes heroBreathe{
+  0%{ filter:brightness(0.94); }
+  100%{ filter:brightness(1.06); }
+}
+.hero-mountains{
+  position:absolute; bottom:0; left:0; right:0; height:42%;
+  background:rgba(10,16,18,0.7);
+  clip-path:polygon(0 100%,0 62%,7% 38%,16% 58%,28% 16%,40% 50%,52% 28%,64% 8%,76% 35%,87% 18%,100% 38%,100% 100%);
+}
+.hero-body{
+  position:relative; z-index:2; flex:1;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  padding:16px 20px 90px; text-align:center;
+}
+.hero-logo-glow{
+  position:absolute; top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  width:420px; height:260px;
+  background:radial-gradient(ellipse, rgba(61,107,115,0.3) 0%, rgba(61,107,115,0.08) 48%, transparent 72%);
+  pointer-events:none; filter:blur(8px);
+}
+.hero-logo{ position:relative; z-index:1; width:94%; max-width:500px; margin-bottom:22px; }
+.hero-logo img{
+  width:100%; height:auto; display:block;
+  mix-blend-mode:screen;
+  filter: brightness(2.2) contrast(0.86) saturate(0.8)
+          drop-shadow(0 0 28px rgba(140,210,225,0.65))
+          drop-shadow(0 0 55px rgba(61,107,115,0.45));
+  animation: logoFloat 7s ease-in-out infinite;
+}
+@keyframes logoFloat{
+  0%,100%{ transform:translateY(0); }
+  50%{ transform:translateY(-7px); }
+}
+.hero-slogan{
+  font-family:var(--fd);
+  font-size:clamp(2.2rem, 8vw, 3.6rem);
+  font-weight:400; font-style:italic;
+  color:rgba(255,255,255,1); line-height:1.1;
+  margin-bottom:12px;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.6);
+}
+.hero-slogan .sur{ color:var(--atl-lt); font-weight:700; }
+.hero-slogan .usl{ color:#fff; font-weight:700; font-style:normal; }
+.hero-region{
+  font-family:var(--fd); font-size:1.1rem;
+  font-style:italic; font-weight:300;
+  color:rgba(163,196,204,0.9); margin-bottom:36px;
+  letter-spacing:0.03em;
+}
+.hero-cta{
+  background:var(--atl); color:var(--cream);
+  border:none; padding:16px 28px; width:100%; max-width:360px;
+  font-size:0.86rem; letter-spacing:0.13em; text-transform:uppercase;
+  cursor:pointer; font-family:var(--fb); font-weight:400;
+  margin-bottom:10px; transition:background 0.2s;
+}
+.hero-cta:hover{ background:#2d5560; }
+.hero-btn2{
+  background:rgba(250,248,245,0.1); border:1px solid rgba(250,248,245,0.28);
+  color:rgba(250,248,245,0.88); padding:13px 20px;
+  width:100%; max-width:360px;
+  font-size:0.76rem; letter-spacing:0.1em; text-transform:uppercase;
+  cursor:pointer; font-family:var(--fb); margin-bottom:8px;
+  transition:all 0.2s;
+}
+.hero-btn2:hover{ background:rgba(250,248,245,0.18); }
+.hero-btn3{
+  background:rgba(61,107,115,0.2); border:1px solid rgba(61,107,115,0.5);
+  color:rgba(163,196,204,0.95); padding:13px 20px;
+  width:100%; max-width:360px;
+  font-size:0.76rem; letter-spacing:0.1em; text-transform:uppercase;
+  cursor:pointer; font-family:var(--fb);
+  transition:all 0.2s;
+}
+.hero-btn3:hover{ background:rgba(61,107,115,0.32); }
+
+/* ═══════════════════════════════
+   DESTINATIONS
+═══════════════════════════════ */
+#view-dest{ background:var(--cream); }
+.vhead{ padding:20px 18px 8px; }
+.vhead h2{ font-family:var(--fd); font-size:clamp(1.7rem,5vw,2.4rem); font-weight:400; color:var(--night); line-height:1.05; margin-bottom:5px; }
+.vhead h2 em{ font-style:italic; color:var(--atl); }
+.vhead p{ font-size:0.75rem; color:var(--bark); }
+.dest-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:14px 14px 20px; }
+.dest-card{ border-radius:2px; overflow:hidden; position:relative; cursor:pointer; height:155px; }
+.dest-card.wide{ grid-column:1/-1; height:175px; }
+.dest-card img{ width:100%; height:100%; object-fit:cover; transition:transform 0.5s ease; display:block; }
+.dest-card:hover img, .dest-card:active img{ transform:scale(1.04); }
+.dest-ov{
+  position:absolute; inset:0;
+  background:linear-gradient(180deg, transparent 25%, rgba(6,14,16,0.88) 100%);
+  padding:12px 14px; display:flex; flex-direction:column; justify-content:flex-end;
+}
+.dest-tag{ font-size:0.58rem; letter-spacing:0.16em; text-transform:uppercase; color:rgba(163,196,204,0.75); margin-bottom:3px; }
+.dest-name{ font-family:var(--fd); font-size:1.25rem; font-weight:400; color:#fff; line-height:1.05; }
+.dest-name em{ font-style:italic; color:rgba(163,196,204,0.9); }
+.dest-arr{ position:absolute; top:10px; right:10px; color:rgba(250,248,245,0.45); font-size:0.85rem; }
+
+/* Dest footer */
+.dest-footer{ padding:20px 16px 28px; border-top:1px solid var(--ash); }
+.dest-footer-btns{ display:flex; flex-direction:column; gap:9px; margin-bottom:18px; }
+.dfbtn{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:13px 16px; cursor:pointer; border:1px solid var(--ash);
+  background:var(--fog); transition:border-color 0.2s;
+}
+.dfbtn:hover{ border-color:var(--atl); }
+.dfbtn.dark{ background:var(--night); border-color:var(--night); }
+.dfbtn p{ font-size:0.65rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--atl); margin-bottom:2px; }
+.dfbtn h4{ font-family:var(--fd); font-size:1rem; font-weight:400; color:var(--night); }
+.dfbtn.dark h4{ color:var(--cream); }
+.dfbtn span{ color:var(--ash); font-size:0.85rem; }
+.dfbtn.dark span{ color:rgba(163,196,204,0.7); }
+.dest-legal{ display:flex; gap:14px; flex-wrap:wrap; justify-content:center; margin-bottom:10px; }
+.dest-legal a{ font-size:0.64rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--bark); text-decoration:none; border-bottom:1px solid var(--ash); }
+.dest-copy{ text-align:center; font-size:0.58rem; color:var(--ash); font-family:var(--fd); font-style:italic; }
+.dest-copy em{ color:var(--atl); font-style:normal; }
+
+/* ═══════════════════════════════
+   CATEGORIES
+═══════════════════════════════ */
+#view-cats{ background:var(--fog); }
+.cat-hero{ height:140px; position:relative; overflow:hidden; flex-shrink:0; }
+.cat-hero img{ width:100%; height:100%; object-fit:cover; }
+.cat-hero-ov{
+  position:absolute; inset:0;
+  background:linear-gradient(180deg, transparent 15%, rgba(6,14,16,0.82) 100%);
+  padding:14px 18px; display:flex; flex-direction:column; justify-content:flex-end;
+}
+.cat-hero-reg{ font-size:0.6rem; letter-spacing:0.16em; text-transform:uppercase; color:rgba(163,196,204,0.75); margin-bottom:3px; }
+.cat-hero-name{ font-family:var(--fd); font-size:clamp(1.6rem,5vw,2.4rem); font-weight:400; color:#fff; line-height:1; }
+.cat-sub{ padding:14px 16px 4px; font-size:0.66rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--bark); }
+.cat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:9px; padding:10px 14px 20px; }
+.cat-card{
+  background:var(--cream); border:1px solid var(--ash);
+  padding:16px 13px; cursor:pointer;
+  display:flex; flex-direction:column; gap:7px;
+  transition:border-color 0.2s, background 0.2s; position:relative;
+}
+.cat-card:hover,.cat-card:active{ border-color:var(--atl); background:rgba(61,107,115,0.04); }
+.cat-icon{ font-size:1.3rem; line-height:1; }
+.cat-nm{ font-family:var(--fd); font-size:1.05rem; font-weight:400; color:var(--night); line-height:1.1; }
+.cat-ct{ font-size:0.63rem; color:var(--bark); letter-spacing:0.05em; line-height:1.4; }
+.cat-ar{ position:absolute; bottom:10px; right:10px; color:var(--ash); font-size:0.78rem; }
+
+/* ═══════════════════════════════
+   LISTINGS
+═══════════════════════════════ */
+#view-list{ background:var(--fog); }
+.list-head{ padding:15px 16px 8px; display:flex; align-items:baseline; justify-content:space-between; flex-shrink:0; }
+.list-title{ font-family:var(--fd); font-size:1.5rem; font-weight:400; color:var(--night); }
+.list-sub{ font-size:0.66rem; color:var(--bark); }
+.list-sort{ padding:5px 9px; font-size:0.65rem; border:1px solid var(--ash); background:var(--cream); color:var(--soil); font-family:var(--fb); }
+.lcard{
+  display:flex; background:var(--cream); border-bottom:1px solid var(--stone);
+  cursor:pointer; transition:background 0.2s; overflow:hidden;
+}
+.lcard:hover,.lcard:active{ background:rgba(61,107,115,0.04); }
+.lcard-img{ width:108px; flex-shrink:0; position:relative; overflow:hidden; }
+.lcard-img img{ width:100%; height:100%; object-fit:cover; transition:transform 0.4s ease; }
+.lcard:hover .lcard-img img{ transform:scale(1.04); }
+.lcard-badge{
+  position:absolute; top:6px; left:6px;
+  background:rgba(250,248,245,0.92); color:var(--soil);
+  font-size:0.54rem; letter-spacing:0.1em; text-transform:uppercase; padding:2px 6px; font-weight:500;
+}
+.lcard-body{ padding:12px 14px 13px; flex:1; display:flex; flex-direction:column; justify-content:space-between; }
+.lcard-loc{ font-size:0.6rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--bark); margin-bottom:3px; font-weight:500; }
+.lcard-name{ font-family:var(--fd); font-size:1.05rem; font-weight:400; color:var(--night); line-height:1.1; margin-bottom:4px; }
+.lcard-desc{ font-size:0.73rem; color:var(--soil); line-height:1.5; margin-bottom:9px; }
+.lcard-foot{ display:flex; align-items:center; justify-content:space-between; }
+.fav{ background:none; border:none; cursor:pointer; font-size:0.95rem; color:var(--ash); padding:0; transition:color 0.2s; }
+.fav.on{ color:var(--ember); }
+.lcta{ font-size:0.62rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--atl); text-decoration:none; border-bottom:1px solid var(--atl); padding-bottom:1px; }
+.list-note{ margin:6px 14px 20px; padding:11px 13px; background:rgba(61,107,115,0.06); border-left:2px solid var(--atl); }
+.list-note p{ font-size:0.68rem; color:var(--bark); line-height:1.5; font-style:italic; }
+
+/* ═══════════════════════════════
+   PROFILE
+═══════════════════════════════ */
+#view-prof{ background:var(--cream); }
+.prof-hero{ height:46vw; max-height:310px; position:relative; overflow:hidden; flex-shrink:0; }
+.prof-hero img{ width:100%; height:100%; object-fit:cover; }
+.prof-hero-ov{ position:absolute; inset:0; background:linear-gradient(180deg, rgba(6,14,16,0.1) 0%, rgba(6,14,16,0.65) 100%); }
+.prof-badges{ position:absolute; top:12px; left:12px; display:flex; gap:5px; flex-wrap:wrap; }
+.badge{ background:rgba(250,248,245,0.14); backdrop-filter:blur(5px); border:1px solid rgba(250,248,245,0.2); color:#fff; font-size:0.57rem; letter-spacing:0.1em; text-transform:uppercase; padding:3px 8px; }
+.verified{ display:inline-flex; align-items:center; gap:5px; background:rgba(61,107,115,0.1); border:1px solid var(--atl); color:var(--atl); font-size:0.58rem; letter-spacing:0.1em; text-transform:uppercase; padding:4px 8px; margin-bottom:11px; }
+.verified::before{ content:'✓'; font-weight:700; }
+.prof-body{ padding:18px 18px 0; }
+.prof-name{ font-family:var(--fd); font-size:clamp(1.7rem,5vw,2.4rem); font-weight:400; color:var(--night); line-height:1.05; margin-bottom:4px; }
+.prof-name em{ font-style:italic; color:var(--bark); }
+.prof-loc{ font-size:0.67rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--bark); margin-bottom:16px; display:flex; align-items:center; gap:4px; }
+.prof-loc::before{ content:'◎'; color:var(--atl); }
+.prof-desc{ font-size:0.88rem; line-height:1.75; color:var(--soil); margin-bottom:16px; }
+.gal-tabs{ display:flex; gap:5px; margin-bottom:9px; }
+.gtab{ padding:5px 10px; font-size:0.64rem; letter-spacing:0.1em; text-transform:uppercase; border:1px solid var(--ash); background:transparent; color:var(--bark); cursor:pointer; font-family:var(--fb); transition:all 0.2s; }
+.gtab.on,.gtab:hover{ background:var(--night); color:var(--cream); border-color:var(--night); }
+.gal-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:5px; margin-bottom:16px; }
+.gal-item{ aspect-ratio:1; overflow:hidden; }
+.gal-item img{ width:100%; height:100%; object-fit:cover; }
+.divider{ height:1px; background:var(--ash); margin:15px 0; }
+.amenities{ display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-bottom:18px; }
+.am{ display:flex; align-items:center; gap:7px; font-size:0.75rem; color:var(--soil); }
+.am-ic{ width:18px; height:18px; background:var(--stone); display:flex; align-items:center; justify-content:center; font-size:0.6rem; flex-shrink:0; }
+.consult-btn{
+  display:flex; align-items:center; justify-content:center; gap:7px;
+  background:var(--fog); border:1px solid var(--atl); color:var(--atl);
+  padding:12px 16px; font-size:0.73rem; letter-spacing:0.08em; text-transform:uppercase;
+  text-decoration:none; font-family:var(--fb); cursor:pointer; width:100%; margin-bottom:10px;
+  transition:all 0.2s;
+}
+.consult-btn:hover{ background:var(--atl); color:var(--cream); }
+.contact-box{ background:var(--night); padding:18px 18px 20px; }
+.contact-box h3{ font-family:var(--fd); font-size:1.2rem; font-weight:400; color:var(--cream); margin-bottom:5px; }
+.contact-box p{ font-size:0.74rem; color:var(--ash); margin-bottom:14px; line-height:1.6; }
+.cbbtns{ display:flex; gap:7px; flex-wrap:wrap; }
+.bwa{ display:flex; align-items:center; gap:6px; background:#25D366; color:#fff; padding:10px 15px; font-size:0.7rem; letter-spacing:0.08em; text-transform:uppercase; text-decoration:none; font-family:var(--fb); }
+.big{ background:linear-gradient(135deg,#f09433,#dc2743,#bc1888); color:#fff; padding:10px 15px; font-size:0.7rem; letter-spacing:0.08em; text-transform:uppercase; text-decoration:none; font-family:var(--fb); }
+.bweb{ background:var(--atl); color:var(--cream); padding:10px 15px; font-size:0.7rem; letter-spacing:0.08em; text-transform:uppercase; text-decoration:none; font-family:var(--fb); }
+.nearby-title{ font-size:0.64rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--bark); margin:18px 18px 10px; display:flex; align-items:center; gap:5px; }
+.nearby-title::before{ content:'◎'; color:var(--atl); }
+.nearby-list{ display:flex; flex-direction:column; gap:7px; padding:0 18px 18px; }
+.ni{ display:flex; align-items:center; gap:10px; padding:9px 12px; border:1px solid var(--ash); background:var(--fog); cursor:pointer; text-decoration:none; transition:border-color 0.2s; }
+.ni:hover{ border-color:var(--atl); }
+.ni-ic{ width:32px; height:32px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:0.82rem; background:var(--stone); }
+.ni-nm{ font-size:0.78rem; font-weight:500; color:var(--night); }
+.ni-tp{ font-size:0.6rem; color:var(--bark); letter-spacing:0.08em; text-transform:uppercase; }
+.share-btn{ margin:0 18px 28px; background:none; border:1px solid var(--ash); padding:8px 14px; font-size:0.64rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--bark); cursor:pointer; font-family:var(--fb); display:flex; align-items:center; gap:5px; }
+
+/* ═══════════════════════════════
+   SOBRE CONFÍN
+═══════════════════════════════ */
+#view-sobre{ background:var(--cream); }
+.manifesto-block{ padding:32px 18px; border-bottom:1px solid var(--ash); }
+.manifesto-block blockquote{
+  font-family:var(--fd); font-size:clamp(1.2rem,4vw,1.7rem);
+  font-weight:300; font-style:italic; color:var(--soil);
+  line-height:1.5; border-left:3px solid var(--atl); padding-left:16px;
+}
+.manifesto-block cite{ display:block; font-style:normal; font-size:0.63rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--ash); margin-top:12px; font-family:var(--fb); }
+.sec{ padding:28px 18px; border-bottom:1px solid var(--ash); }
+.sec h2{ font-family:var(--fd); font-size:clamp(1.6rem,4.5vw,2.2rem); font-weight:400; color:var(--night); margin-bottom:18px; line-height:1.05; }
+.sec h2 em{ font-style:italic; color:var(--atl); }
+.hiw{ display:flex; flex-direction:column; gap:10px; margin-bottom:14px; }
+.hiw-step{ padding:16px 15px; border:1px solid var(--ash); background:var(--fog); }
+.hiw-num{ font-family:var(--fd); font-size:2rem; font-weight:400; color:var(--ash); line-height:1; margin-bottom:6px; }
+.hiw-step h4{ font-family:var(--fd); font-size:1.05rem; font-weight:400; color:var(--night); margin-bottom:5px; }
+.hiw-step p{ font-size:0.76rem; color:var(--bark); line-height:1.6; }
+.hiw-note{ font-size:0.76rem; color:var(--bark); padding:13px 15px; border-left:2px solid var(--atl); background:var(--fog); line-height:1.6; }
+.feat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.feat{ padding:16px 13px; border:1px solid var(--ash); background:var(--fog); }
+.feat-ic{ font-size:1.2rem; display:block; margin-bottom:8px; }
+.feat h4{ font-family:var(--fd); font-size:0.98rem; font-weight:400; color:var(--night); margin-bottom:4px; }
+.feat p{ font-size:0.72rem; color:var(--bark); line-height:1.5; }
+/* Próximamente */
+.prox-block{ padding:28px 18px; background:var(--night); border-bottom:1px solid rgba(196,186,176,0.1); }
+.prox-card{ border:1px solid rgba(61,107,115,0.3); background:rgba(61,107,115,0.07); padding:16px; margin-bottom:12px; }
+.prox-tag{ font-size:0.57rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--atl); margin-bottom:7px; }
+.prox-card h4{ font-family:var(--fd); font-size:1.15rem; font-weight:400; color:var(--cream); margin-bottom:5px; }
+.prox-card p{ font-size:0.74rem; color:var(--ash); line-height:1.6; }
+.prox-cta{ background:var(--atl); color:var(--cream); border:none; padding:13px 22px; font-size:0.76rem; letter-spacing:0.12em; text-transform:uppercase; cursor:pointer; font-family:var(--fb); width:100%; margin-top:4px; }
+/* Registro */
+.reg-block{ padding:28px 18px; background:var(--fog); border-bottom:1px solid var(--ash); }
+.reg-block .eyebrow{ font-size:0.64rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--atl); margin-bottom:9px; }
+.reg-block h2{ font-family:var(--fd); font-size:1.7rem; font-weight:400; color:var(--night); margin-bottom:7px; }
+.reg-block h2 em{ font-style:italic; }
+.reg-block .intro{ font-size:0.8rem; color:var(--bark); line-height:1.6; margin-bottom:20px; }
+.reg-input{ border:1px solid var(--ash); background:var(--cream); padding:12px 14px; font-size:0.84rem; font-family:var(--fb); color:var(--soil); width:100%; display:block; margin-bottom:9px; }
+.reg-input:focus{ outline:none; border-color:var(--bark); }
+.reg-check{ display:flex; align-items:flex-start; gap:9px; margin-bottom:17px; cursor:pointer; }
+.reg-check input{ margin-top:3px; accent-color:var(--atl); flex-shrink:0; }
+.reg-check span{ font-size:0.71rem; color:var(--bark); line-height:1.5; }
+.reg-check a{ color:var(--atl); text-decoration:none; border-bottom:1px solid var(--atl); }
+.reg-submit{ background:var(--atl); color:var(--cream); border:none; padding:13px 22px; font-size:0.78rem; letter-spacing:0.12em; text-transform:uppercase; cursor:pointer; font-family:var(--fb); width:100%; margin-bottom:20px; }
+.pwa-box{ background:var(--stone); padding:15px; }
+.pwa-box .pwa-title{ font-size:0.63rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--bark); margin-bottom:9px; }
+.pwa-box p{ font-size:0.73rem; color:var(--soil); line-height:1.6; margin-bottom:5px; }
+.pwa-box .note{ font-size:0.68rem; color:var(--bark); font-style:italic; margin-top:6px; }
+/* Footer */
+.site-footer{ background:var(--night); padding:32px 18px 20px; }
+.footer-brand{ font-family:var(--fd); font-size:1.7rem; font-weight:400; color:var(--cream); letter-spacing:0.16em; margin-bottom:3px; }
+.footer-brand em{ font-style:italic; color:var(--atl); }
+.footer-tag{ font-size:0.67rem; color:var(--bark); font-style:italic; margin-bottom:22px; }
+.footer-grid{ display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:24px; }
+.fcol h5{ font-size:0.58rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--bark); margin-bottom:8px; }
+.fcol a{ display:block; font-size:0.74rem; color:var(--ash); text-decoration:none; margin-bottom:5px; opacity:0.75; cursor:pointer; }
+.fcol a:hover{ opacity:1; }
+.footer-bottom{ padding-top:14px; border-top:1px solid rgba(196,186,176,0.1); }
+.footer-bottom p{ font-size:0.6rem; color:var(--bark); opacity:0.6; margin-bottom:3px; }
+
+/* ═══════════════════════════════
+   PANEL ANFITRIÓN
+═══════════════════════════════ */
+#view-panel{ background:var(--fog); }
+.panel-intro{ padding:22px 18px 16px; }
+.panel-intro .ey{ font-size:0.63rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--atl); margin-bottom:10px; }
+.panel-intro h2{ font-family:var(--fd); font-size:clamp(1.6rem,5vw,2.2rem); font-weight:400; color:var(--night); line-height:1.05; margin-bottom:10px; }
+.panel-intro h2 em{ font-style:italic; color:var(--atl); }
+.panel-intro p{ font-size:0.8rem; color:var(--bark); line-height:1.7; margin-bottom:20px; }
+.panel-form{ padding:0 18px 18px; display:flex; flex-direction:column; gap:9px; }
+.pf-label{ font-size:0.63rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--bark); display:block; margin-bottom:4px; }
+.pf-input{ border:1px solid var(--ash); background:var(--cream); padding:11px 13px; font-size:0.82rem; font-family:var(--fb); color:var(--soil); width:100%; }
+.pf-input:focus{ outline:none; border-color:var(--bark); }
+.pf-sel{ border:1px solid var(--ash); background:var(--cream); padding:11px 13px; font-size:0.82rem; font-family:var(--fb); color:var(--soil); width:100%; }
+.pf-check{ display:flex; align-items:flex-start; gap:8px; cursor:pointer; }
+.pf-check input{ margin-top:3px; accent-color:var(--atl); flex-shrink:0; }
+.pf-check span{ font-size:0.7rem; color:var(--bark); line-height:1.5; }
+.pf-submit{ background:var(--atl); color:var(--cream); border:none; padding:13px 22px; font-size:0.76rem; letter-spacing:0.12em; text-transform:uppercase; cursor:pointer; font-family:var(--fb); width:100%; margin-top:4px; }
+.panel-prox{ padding:18px; margin:0 18px 18px; border:1px solid rgba(61,107,115,0.28); background:rgba(61,107,115,0.05); }
+.panel-prox .pt{ font-size:0.57rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--atl); margin-bottom:7px; }
+.panel-prox h4{ font-family:var(--fd); font-size:1.1rem; font-weight:400; color:var(--night); margin-bottom:5px; }
+.panel-prox p{ font-size:0.73rem; color:var(--bark); line-height:1.6; }
+.panel-pwa{ background:var(--stone); padding:16px; margin:0 18px 28px; }
+
+/* ═══════════════════════════════
+   TOAST
+═══════════════════════════════ */
+#toast{
+  position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+  background:var(--night); color:var(--cream);
+  padding:10px 20px; font-size:0.7rem; letter-spacing:0.08em;
+  z-index:9999; opacity:0; transition:opacity 0.3s; white-space:nowrap; pointer-events:none;
+}
+#toast.show{ opacity:1; }
+
+/* ═══════════════════════════════
+   RESPONSIVE
+═══════════════════════════════ */
+@media(max-width:380px){
+  .cat-grid,.feat-grid{ grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<div id="toast"></div>
+
+<!-- ══════════════════════════════ -->
+<!-- SPLASH                         -->
+<!-- ══════════════════════════════ -->
+<div class="view active" id="splash">
+  <div id="splash-halo"></div>
+  <div id="splash-logo-wrap">
+    <img src="confin-logo-transparente.png" alt="CONFÍN" translate="no">
+  </div>
+  <div id="splash-slogan">
+    <p>Todo el <em style="color:#5B9BAA;font-weight:700;font-style:italic;">sur</em> en <strong style="font-weight:700;color:#fff;font-style:normal;">un solo lugar</strong></p>
+  </div>
+  <div id="splash-region">
+    <p>Patagonia & Andes Australes</p>
+  </div>
+  <div id="splash-loading">
+    <div class="ln"></div>
+    <p>Cargando</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ -->
+<!-- HERO                           -->
+<!-- ══════════════════════════════ -->
+<div class="view" id="view-hero">
+  <div class="demo-bar"><span>⚠</span> Prototipo — Establecimientos ficticios e ilustrativos</div>
+  <nav class="nav">
+    <div class="nav-logo">
+      <img src="confin-logo-transparente.png" alt="CONFÍN"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+      <span class="nav-logo-text" style="display:none;" translate="no">CON<em>FÍN</em></span>
+    </div>
+    <div class="nav-r">
+      <button class="lbtn on" onclick="setLang(this)">ES</button>
+      <button class="lbtn" onclick="setLang(this)">EN</button>
+      <button class="lbtn" onclick="setLang(this)">PT</button>
+      <button class="fbtn" onclick="setFont(-1)">A-</button>
+      <button class="fbtn" onclick="setFont(1)">A+</button>
+    </div>
+  </nav>
+  <div style="position:relative;flex:1;display:flex;flex-direction:column;overflow:hidden;">
+    <div class="hero-bg"></div>
+    <div class="hero-mountains"></div>
+    <div class="hero-body">
+      <div class="hero-logo">
+        <div class="hero-logo-glow"></div>
+        <img src="confin-logo-transparente.png" alt="CONFÍN" translate="no"
+             onerror="this.style.display='none'">
+      </div>
+      <p class="hero-slogan">Todo el <span class="sur">sur</span> en <span class="usl">un solo lugar</span></p>
+      <p class="hero-region">Patagonia & Andes Australes</p>
+      <button class="hero-cta" onclick="nav('view-dest')">Explorar destinos ↓</button>
+      <button class="hero-btn2" onclick="nav('view-panel')">Publicar mi espacio →</button>
+      <button class="hero-btn3" onclick="nav('view-sobre')">¿Qué es CONFÍN? →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ -->
+<!-- DESTINATIONS                   -->
+<!-- ══════════════════════════════ -->
+<div class="view" id="view-dest">
+  <nav class="nav">
+    <button class="back" onclick="goBack()"><span>←</span> Inicio</button>
+    <div class="nav-r">
+      <button class="lbtn on" onclick="setLang(this)">ES</button>
+      <button class="lbtn" onclick="setLang(this)">EN</button>
+    </div>
+  </nav>
+  <div class="vscroll">
+    <div class="vhead">
+      <h2>Elegí tu <em>destino</em></h2>
+      <p>Patagonia & Andes Australes · Invierno</p>
+    </div>
+    <div class="dest-grid">
+      <div class="dest-card wide" onclick="selDest('San Martín de los Andes','Neuquén · Chapelco','https://images.unsplash.com/photo-1531761535209-180857e963b9?w=800&q=80&fit=crop')">
+        <img src="https://images.unsplash.com/photo-1531761535209-180857e963b9?w=800&q=80&fit=crop" alt="San Martín" loading="lazy">
+        <div class="dest-ov">
+          <div class="dest-tag">Neuquén · Chapelco</div>
+          <div class="dest-name">San Martín <em>de los Andes</em></div>
+        </div>
+        <div class="dest-arr">→</div>
+      </div>
+      <div class="dest-card" onclick="selDest('Bariloche','Río Negro · Catedral','https://images.unsplash.com/photo-1508193638397-1c4234db14d8?w=600&q=80&fit=crop')">
+        <img src="https://images.unsplash.com/photo-1508193638397-1c4234db14d8?w=600&q=80&fit=crop" alt="Bariloche" loading="lazy">
+        <div class="dest-ov"><div class="dest-tag">Río Negro · Catedral</div><div class="dest-name">Bariloche</div></div>
+        <div class="dest-arr">→</div>
+      </div>
+      <div class="dest-card" onclick="selDest('Villa La Angostura','Neuquén · Cerro Bayo','https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&q=80&fit=crop')">
+        <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&q=80&fit=crop" alt="VLA" loading="lazy">
+        <div class="dest-ov"><div class="dest-tag">Neuquén · Cerro Bayo</div><div class="dest-name">Villa La<br>Angostura</div></div>
+        <div class="dest-arr">→</div>
+      </div>
+      <div class="dest-card" onclick="selDest('El Bolsón','Río Negro','https://images.unsplash.com/photo-1448375240586-882707db888b?w=600&q=80&fit=crop')">
+        <img src="https://images.unsplash.com/photo-1448375240586-882707db888b?w=600&q=80&fit=crop" alt="El Bolsón" loading="lazy">
+        <div class="dest-ov"><div class="dest-tag">Río Negro, AR</div><div class="dest-name">El Bolsón</div></div>
+        <div class="dest-arr">→</div>
+      </div>
+      <div class="dest-card" onclick="selDest('Esquel','Chubut · La Hoya','https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=600&q=80&fit=crop')">
+        <img src="https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=600&q=80&fit=crop" alt="Esquel" loading="lazy">
+        <div class="dest-ov"><div class="dest-tag">Chubut · La Hoya</div><div class="dest-name">Esquel</div></div>
+        <div class="dest-arr">→</div>
+      </div>
+      <div class="dest-card" onclick="selDest('Villa Pehuenia','Neuquén','https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80&fit=crop')">
+        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80&fit=crop" alt="Villa Pehuenia" loading="lazy">
+        <div class="dest-ov"><div class="dest-tag">Neuquén, AR</div><div class="dest-name">Villa Pehuenia</div></div>
+        <div class="dest-arr">→</div>
+      </div>
+      <div class="dest-card wide" onclick="selDest('Ushuaia','Tierra del Fuego · Castor','https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=80&fit=crop')">
+        <img src="https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=80&fit=crop" alt="Ushuaia" loading="lazy">
+        <div class="dest-ov"><div class="dest-tag">Tierra del Fuego · Castor</div><div class="dest-name">Ushuaia — <em>Fin del mundo</em></div></div>
+        <div class="dest-arr">→</div>
+      </div>
+    </div>
+    <!-- Footer destinos -->
+    <div class="dest-footer">
+      <div class="dest-footer-btns">
+        <div class="dfbtn" onclick="nav('view-sobre')">
+          <div><p>Próximamente</p><h4>Pasaporte <em style="font-family:var(--fd);font-style:italic;">CONFÍN</em></h4></div>
+          <span>→</span>
+        </div>
+        <div class="dfbtn" onclick="nav('view-sobre')">
+          <div><p>Próximamente</p><h4>Hablá con <em style="font-family:var(--fd);font-style:italic;">CONFÍN</em></h4></div>
+          <span>→</span>
+        </div>
+        <div class="dfbtn dark" onclick="nav('view-panel')">
+          <h4>Publicar mi espacio</h4>
+          <span>→</span>
+        </div>
+      </div>
+      <div class="dest-legal">
+        <a href="#">Términos y condiciones</a>
+        <a href="#">Privacidad</a>
+        <a href="#">Contacto</a>
+      </div>
+      <p class="dest-copy">CON<em>FÍN</em> — Patagonia & Andes Australes · Sin reservas. Sin comisiones.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ -->
+<!-- CATEGORIES                     -->
+<!-- ══════════════════════════════ -->
+<div class="view" id="view-cats">
+  <nav class="nav">
+    <button class="back" onclick="goBack()"><span>←</span> <span id="cats-back">Destinos</span></button>
+  </nav>
+  <div class="cat-hero" id="cat-hero-img">
+    <img id="cat-hero-photo" src="https://images.unsplash.com/photo-1531761535209-180857e963b9?w=800&q=80&fit=crop" alt="">
+    <div class="cat-hero-ov">
+      <div class="cat-hero-reg" id="cat-region">Neuquén · Chapelco</div>
+      <div class="cat-hero-name" id="cat-name">San Martín de los Andes</div>
+    </div>
+  </div>
+  <div class="vscroll">
+    <div class="cat-sub">¿Qué estás buscando?</div>
+    <div class="cat-grid">
+      <div class="cat-card" onclick="selCat('Alojamiento')">
+        <div class="cat-icon">🏠</div>
+        <div class="cat-nm">Alojamiento</div>
+        <div class="cat-ct">Cabañas · Hosterías · Hoteles · Domos</div>
+        <div class="cat-ar">→</div>
+      </div>
+      <div class="cat-card" onclick="selCat('Gastronomía')">
+        <div class="cat-icon">☕</div>
+        <div class="cat-nm">Gastronomía</div>
+        <div class="cat-ct">Restaurantes · Cafés · Cervecerías</div>
+        <div class="cat-ar">→</div>
+      </div>
+      <div class="cat-card" onclick="selCat('Experiencias')">
+        <div class="cat-icon">🎿</div>
+        <div class="cat-nm">Experiencias</div>
+        <div class="cat-ct">Ski · Trekking · Nieve · Naturaleza</div>
+        <div class="cat-ar">→</div>
+      </div>
+      <div class="cat-card" onclick="selCat('Wellness')">
+        <div class="cat-icon">✦</div>
+        <div class="cat-nm">Wellness</div>
+        <div class="cat-ct">Spas · Termas · Retiros</div>
+        <div class="cat-ar">→</div>
+      </div>
+      <div class="cat-card" onclick="selCat('Comercios')">
+        <div class="cat-icon">🧥</div>
+        <div class="cat-nm">Comercios</div>
+        <div class="cat-ct">Outdoor · Artesanías · Local</div>
+        <div class="cat-ar">→</div>
+      </div>
+      <div class="cat-card" onclick="selCat('Viajar sola')">
+        <div class="cat-icon">∘</div>
+        <div class="cat-nm">Viajar sola</div>
+        <div class="cat-ct">Espacios verificados y seguros</div>
+        <div class="cat-ar">→</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ -->
+<!-- LISTINGS                       -->
+<!-- ══════════════════════════════ -->
+<div class="view" id="view-list">
+  <nav class="nav">
+    <button class="back" onclick="goBack()"><span>←</span> <span id="list-back">Categorías</span></button>
+    <select class="list-sort">
+      <option>Por zona</option>
+      <option>Por tipo</option>
+      <option>Recién sumados</option>
+    </select>
+  </nav>
+  <div class="list-head" style="flex-shrink:0;">
+    <div>
+      <div class="list-title" id="list-title">Alojamiento</div>
+      <div class="list-sub" id="list-sub">San Martín de los Andes</div>
+    </div>
+  </div>
+  <div class="vscroll">
+    <div id="list-grid"></div>
+    <div class="list-note">
+      <p>Las imágenes y establecimientos son ilustrativos hasta la incorporación oficial de cada espacio.</p>
+    </div>
+    <div style="height:24px;"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ -->
+<!-- PROFILE                        -->
+<!-- ══════════════════════════════ -->
+<div class="view" id="view-prof">
+  <nav class="nav" style="z-index:10;">
+    <button class="back" onclick="goBack()"><span>←</span> Resultados</button>
+    <button onclick="toggleFav(this)" style="background:none;border:none;cursor:pointer;font-size:1.3rem;color:var(--ash);">♡</button>
+  </nav>
+  <div class="vscroll">
+    <div class="prof-hero">
+      <img src="https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?w=800&q=80&fit=crop" alt="Cabaña del Alerce">
+      <div class="prof-hero-ov"></div>
+      <div class="prof-badges">
+        <span class="badge">Lago Lácar</span>
+        <span class="badge">2 personas</span>
+        <span class="badge">🐾 Mascotas</span>
+      </div>
+    </div>
+    <div class="prof-body">
+      <div class="verified">Anfitrión Verificado por CONFÍN</div>
+      <h1 class="prof-name">Cabaña <em>del Alerce</em></h1>
+      <div class="prof-loc">San Martín de los Andes, Neuquén</div>
+      <div class="gal-tabs">
+        <button class="gtab on" onclick="setTab(this)">Interiores</button>
+        <button class="gtab" onclick="setTab(this)">Vistas</button>
+        <button class="gtab" onclick="setTab(this)">Servicios</button>
+      </div>
+      <div class="gal-grid">
+        <div class="gal-item"><img src="https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?w=300&q=80&fit=crop" alt=""></div>
+        <div class="gal-item"><img src="https://images.unsplash.com/photo-1531761535209-180857e963b9?w=300&q=80&fit=crop" alt=""></div>
+        <div class="gal-item"><img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&q=80&fit=crop" alt=""></div>
+        <div class="gal-item"><img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=300&q=80&fit=crop" alt=""></div>
+        <div class="gal-item"><img src="https://images.unsplash.com/photo-1448375240586-882707db888b?w=300&q=80&fit=crop" alt=""></div>
+        <div class="gal-item"><img src="https://images.unsplash.com/photo-1501854140801-50d01698950b?w=300&q=80&fit=crop" alt=""></div>
+      </div>
+      <p class="prof-desc">Cabaña de troncos construida a mano, a 200m del lago Lácar. Vista al volcán Lanín. Bosque de alerces, silencio y kayak incluido. Sin wifi — solo el sur.</p>
+      <h3 style="font-size:0.66rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--bark);margin-bottom:11px;">Lo que incluye</h3>
+      <div class="amenities">
+        <div class="am"><span class="am-ic">☕</span> Cocina equipada</div>
+        <div class="am"><span class="am-ic">🔥</span> Chimenea a leña</div>
+        <div class="am"><span class="am-ic">🌿</span> Jardín y parrilla</div>
+        <div class="am"><span class="am-ic">🛶</span> Kayak incluido</div>
+        <div class="am"><span class="am-ic">🐾</span> Mascotas sí</div>
+        <div class="am"><span class="am-ic">🌄</span> Vista al volcán</div>
+      </div>
+      <div class="divider"></div>
+      <button class="consult-btn" onclick="consultarFechas()">📅 Consultar fechas especiales</button>
+      <div class="contact-box">
+        <h3>Contactar al anfitrión</h3>
+        <p>Consultá directo. CONFÍN conecta — el resto es entre vos y el anfitrión.</p>
+        <div class="cbbtns">
+          <a href="#" class="bwa">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            WhatsApp
+          </a>
+          <a href="#" class="big">Instagram</a>
+          <a href="#" class="bweb">🌐 Web</a>
+        </div>
+      </div>
+    </div>
+    <div class="nearby-title">A pocos metros en CONFÍN</div>
+    <div class="nearby-list">
+      <a class="ni" onclick="nav('view-prof')">
+        <div class="ni-ic">☕</div>
+        <div><div class="ni-nm">La Casa del Mate</div><div class="ni-tp">Casa de té</div></div>
+      </a>
+      <a class="ni" onclick="nav('view-prof')">
+        <div class="ni-ic">🎿</div>
+        <div><div class="ni-nm">Nieve Viva Ski School</div><div class="ni-tp">Ski</div></div>
+      </a>
+      <a class="ni" onclick="nav('view-prof')">
+        <div class="ni-ic">🧥</div>
+        <div><div class="ni-nm">Outdoor Patagonia</div><div class="ni-tp">Ropa outdoor</div></div>
+      </a>
+    </div>
+    <button class="share-btn" onclick="sharePerfil()">↗ Compartir este lugar</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ -->
+<!-- SOBRE CONFÍN                   -->
+<!-- ══════════════════════════════ -->
+<div class="view" id="view-sobre">
+  <nav class="nav">
+    <button class="back" onclick="goBack()"><span>←</span> Inicio</button>
+  </nav>
+  <div class="vscroll">
+    <!-- Manifesto -->
+    <div class="manifesto-block">
+      <blockquote>"No somos un directorio. Somos el ecosistema del sur: el lugar, la experiencia, la mesa, el guía. Todo conectado. Nada intermediado."</blockquote>
+      <cite>— <span style="font-family:var(--fd);font-style:italic;">CON<span style="color:var(--atl);">FÍN</span></span>, Patagonia & Andes Australes</cite>
+    </div>
+    <!-- Cómo funciona -->
+    <div class="sec">
+      <h2>¿Por qué <em>CONFÍN?</em></h2>
+      <div class="hiw">
+        <div class="hiw-step">
+          <div class="hiw-num">01</div>
+          <h4>Explorás</h4>
+          <p>Destinos, filtros emocionales y colecciones curadas del sur.</p>
+        </div>
+        <div class="hiw-step">
+          <div class="hiw-num">02</div>
+          <h4>Encontrás</h4>
+          <p>Perfiles reales y verificados. Fotos honestas, anfitriones reales.</p>
+        </div>
+        <div class="hiw-step">
+          <div class="hiw-num">03</div>
+          <h4>Contactás directo</h4>
+          <p>WhatsApp o Instagram del anfitrión. Sin comisiones. Sin intermediarios.</p>
+        </div>
+      </div>
+      <div class="hiw-note">
+        <span style="font-family:var(--fd);font-style:italic;">CON<span style="color:var(--atl);">FÍN</span></span> no gestiona reservas ni pagos. Solo conecta.
+      </div>
+    </div>
+    <!-- Features -->
+    <div class="sec">
+      <h2>El <em>ecosistema</em> del sur</h2>
+      <div class="feat-grid">
+        <div class="feat"><span class="feat-ic">◎</span><h4>Conexión directa</h4><p>Directo al anfitrión. Sin comisiones.</p></div>
+        <div class="feat"><span class="feat-ic">∿</span><h4>Slow travel</h4><p>El ritmo del sur. Cabañas, hosterías, domos.</p></div>
+        <div class="feat"><span class="feat-ic">⌘</span><h4>Ecosistema completo</h4><p>No solo dónde dormir. Gastronomía, experiencias, wellness.</p></div>
+        <div class="feat"><span class="feat-ic">⟁</span><h4>Curado y verificado</h4><p>Cada perfil revisado antes de publicarse.</p></div>
+      </div>
+    </div>
+    <!-- Próximamente -->
+    <div class="prox-block">
+      <div class="prox-card">
+        <div class="prox-tag">Próximamente</div>
+        <h4>Pasaporte <em style="font-style:italic;">CONFÍN</em></h4>
+        <p>Beneficios exclusivos en cada destino. Descuentos, cortesías y experiencias especiales.</p>
+      </div>
+      <div class="prox-card">
+        <div class="prox-tag">Próximamente</div>
+        <h4>Hablá con <em style="font-style:italic;">CONFÍN</em></h4>
+        <p>Preguntale a CONFÍN qué hacer, dónde comer o dónde alojarte. Recomendaciones reales según dónde estés.</p>
+      </div>
+      <button class="prox-cta" onclick="nav('view-panel')">Publicar mi espacio →</button>
+    </div>
+    <!-- Registro -->
+    <div class="reg-block">
+      <div class="eyebrow">Tu cuenta en CONFÍN</div>
+      <h2>Guardá tus <em>lugares favoritos</em></h2>
+      <p class="intro">Creá tu cuenta para guardar favoritos, recibir novedades y no perder nada aunque cierres la app.</p>
+      <input class="reg-input" type="text" placeholder="Tu nombre">
+      <input class="reg-input" type="email" placeholder="Tu email">
+      <input class="reg-input" type="password" placeholder="Contraseña">
+      <label class="reg-check">
+        <input type="checkbox">
+        <span>Leí y acepto los <a href="#">Términos y Condiciones</a> y la <a href="#">Política de Privacidad</a>.</span>
+      </label>
+      <button class="reg-submit" onclick="showToast('¡Bienvenido/a a CONFÍN!')">Crear mi cuenta</button>
+      <div class="pwa-box">
+        <div class="pwa-title">📱 Agregá CONFÍN a tu pantalla de inicio</div>
+        <p><strong>iPhone:</strong> ícono compartir ↑ → "Agregar a pantalla de inicio"</p>
+        <p><strong>Android:</strong> tres puntos ⋮ → "Agregar a pantalla de inicio"</p>
+        <p class="note">Así accedés siempre y no perdés tus favoritos.</p>
+      </div>
+    </div>
+    <!-- Footer -->
+    <div class="site-footer">
+      <div class="footer-brand">CON<em>FÍN</em></div>
+      <div class="footer-tag">Patagonia & Andes Australes</div>
+      <div class="footer-grid">
+        <div class="fcol">
+          <h5>Explorar</h5>
+          <a onclick="nav('view-dest')">Alojamientos</a>
+          <a onclick="nav('view-dest')">Experiencias</a>
+          <a onclick="nav('view-dest')">Gastronomía</a>
+          <a onclick="nav('view-dest')">Wellness</a>
+          <a onclick="nav('view-dest')">Comercios</a>
+        </div>
+        <div class="fcol">
+          <h5>Destinos</h5>
+          <a onclick="nav('view-dest')">Patagonia Argentina</a>
+          <a onclick="nav('view-dest')">Patagonia Chilena</a>
+          <h5 style="margin-top:14px;">Anfitriones</h5>
+          <a onclick="nav('view-panel')">Publicar mi espacio</a>
+          <a href="#">Preguntas frecuentes</a>
+        </div>
+        <div class="fcol">
+          <h5>CONFÍN</h5>
+          <a href="https://instagram.com" target="_blank">Instagram ↗</a>
+          <a href="#">Términos y condiciones</a>
+          <a href="#">Política de privacidad</a>
+          <a href="#">Contacto</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2025 CONFÍN. Hecho en la Patagonia.</p>
+        <p>Sin reservas. Sin comisiones. Solo conexión real.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ -->
+<!-- PANEL ANFITRIÓN                -->
+<!-- ══════════════════════════════ -->
+<div class="view" id="view-panel">
+  <nav class="nav">
+    <button class="back" onclick="goBack()"><span>←</span> Inicio</button>
+    <span style="font-family:var(--fd);font-size:0.9rem;color:var(--night);" translate="no">CON<em style="font-style:italic;color:var(--atl);">FÍN</em> · Anfitriones</span>
+  </nav>
+  <div class="vscroll">
+    <div class="panel-intro">
+      <div class="ey">¿Tenés un espacio en el sur?</div>
+      <h2>Unite a <em>CONFÍN</em></h2>
+      <p>Conectá tu cabaña, restaurante, experiencia o comercio con viajeros que buscan lo auténtico. Sin reservas, sin comisiones. Solo visibilidad real en el ecosistema del sur.</p>
+    </div>
+    <div class="panel-form">
+      <div>
+        <label class="pf-label">Nombre del espacio</label>
+        <input class="pf-input" type="text" placeholder="Ej: Cabaña del Alerce">
+      </div>
+      <div>
+        <label class="pf-label">Tipo de espacio</label>
+        <select class="pf-sel">
+          <option>Elegí una opción...</option>
+          <option>Cabaña</option>
+          <option>Hostería / B&B</option>
+          <option>Hotel Boutique</option>
+          <option>Domo / Glamping</option>
+          <option>Restaurante</option>
+          <option>Café / Casa de té</option>
+          <option>Experiencia / Excursión</option>
+          <option>Wellness / Spa</option>
+          <option>Comercio</option>
+        </select>
+      </div>
+      <div>
+        <label class="pf-label">Localidad</label>
+        <input class="pf-input" type="text" placeholder="Ej: San Martín de los Andes">
+      </div>
+      <div>
+        <label class="pf-label">WhatsApp de contacto</label>
+        <input class="pf-input" type="tel" placeholder="+54 9 ...">
+      </div>
+      <div>
+        <label class="pf-label">Email</label>
+        <input class="pf-input" type="email" placeholder="tu@email.com">
+      </div>
+      <label class="pf-check">
+        <input type="checkbox">
+        <span>Acepto los Términos y Condiciones de CONFÍN</span>
+      </label>
+      <button class="pf-submit" onclick="showToast('¡Gracias! Te contactamos pronto.')">Quiero publicar mi espacio</button>
+    </div>
+    <div class="panel-prox">
+      <div class="pt">Próximamente</div>
+      <h4>Pasaporte <em style="font-style:italic;">CONFÍN</em></h4>
+      <p>Beneficios exclusivos para tus huéspedes. Descuentos, cortesías y experiencias especiales.</p>
+    </div>
+    <div class="panel-prox">
+      <div class="pt">Próximamente</div>
+      <h4>Hablá con <em style="font-style:italic;">CONFÍN</em></h4>
+      <p>Cuando el asistente IA esté activo, solo recomendará lugares dentro de CONFÍN. Si no estás, no aparecés.</p>
+    </div>
+    <div class="panel-pwa">
+      <div class="pf-label" style="margin-bottom:9px;">📱 Agregá CONFÍN a tu pantalla de inicio</div>
+      <p style="font-size:0.73rem;color:var(--soil);line-height:1.6;margin-bottom:5px;"><strong>iPhone:</strong> ícono compartir ↑ → "Agregar a pantalla de inicio"</p>
+      <p style="font-size:0.73rem;color:var(--soil);line-height:1.6;"><strong>Android:</strong> tres puntos ⋮ → "Agregar a pantalla de inicio"</p>
+    </div>
+    <div style="height:28px;"></div>
+  </div>
+</div>
+
+<script>
+// ══ STATE ══
+let curView = 'view-hero';
+let navStack = [];
+let curDest = { name:'San Martín de los Andes', region:'Neuquén · Chapelco', img:'https://images.unsplash.com/photo-1531761535209-180857e963b9?w=800&q=80&fit=crop' };
+let curCat = 'Alojamiento';
+let fontSize = 16;
+
+// ══ NAVIGATION ══
+function nav(viewId) {
+  const cur = document.getElementById(curView);
+  const nxt = document.getElementById(viewId);
+  if(!nxt || viewId === curView) return;
+  navStack.push(curView);
+  cur.classList.add('exit');
+  setTimeout(() => {
+    cur.classList.remove('active','exit');
+    nxt.classList.add('active');
+    // Scroll to top
+    const sc = nxt.querySelector('.vscroll');
+    if(sc) sc.scrollTop = 0;
+  }, 320);
+  curView = viewId;
+}
+
+function goBack() {
+  if(navStack.length === 0) return;
+  const prev = navStack.pop();
+  const cur = document.getElementById(curView);
+  const prevEl = document.getElementById(prev);
+  cur.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+  cur.style.opacity = '0';
+  cur.style.transform = 'translateX(24px)';
+  setTimeout(() => {
+    cur.classList.remove('active');
+    cur.style.cssText = '';
+    prevEl.classList.add('active');
+  }, 300);
+  curView = prev;
+}
+
+// ══ DEST SELECTION ══
+function selDest(name, region, img) {
+  curDest = { name, region, img };
+  document.getElementById('cat-name').textContent = name;
+  document.getElementById('cat-region').textContent = region;
+  document.getElementById('cat-hero-photo').src = img;
+  document.getElementById('cats-back').textContent = 'Destinos';
+  nav('view-cats');
+}
+
+// ══ CAT SELECTION ══
+function selCat(cat) {
+  curCat = cat;
+  document.getElementById('list-title').textContent = cat;
+  document.getElementById('list-sub').textContent = curDest.name;
+  document.getElementById('list-back').textContent = curDest.name;
+  renderList(cat);
+  nav('view-list');
+}
+
+// ══ LISTINGS DATA ══
+const DATA = {
+  'Alojamiento':[
+    {n:'Cabaña del Alerce',l:'San Martín de los Andes',d:'Cabaña de troncos frente al lago Lácar. Vista al volcán Lanín.',t:'Cabaña',img:'https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?w=400&q=80&fit=crop'},
+    {n:'Hostería Viento Sur',l:'San Martín de los Andes',d:'Pequeña hostería familiar con desayuno incluido y vista al cerro.',t:'Hostería',img:'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80&fit=crop'},
+    {n:'Apart Lago Azul',l:'San Martín de los Andes',d:'Departamentos con cocina equipada, a 3 cuadras del centro.',t:'Apart Hotel',img:'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&q=80&fit=crop'},
+    {n:'Hotel El Refugio',l:'San Martín de los Andes',d:'Hotel boutique de 12 habitaciones con spa y gastronomía de autor.',t:'Hotel Boutique',img:'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=400&q=80&fit=crop'},
+    {n:'Nómade Patagónico',l:'San Martín de los Andes',d:'Hostel con ambiente viajero, fogón nocturno y cocina compartida.',t:'Hostel',img:'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400&q=80&fit=crop'},
+    {n:'Domo Cielo Abierto',l:'Lago Meliquina',d:'Domo geodésico para 2. Cielo estrellado garantizado.',t:'Domo',img:'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&q=80&fit=crop'},
+  ],
+  'Gastronomía':[
+    {n:'La Casa del Mate',l:'San Martín de los Andes',d:'Casa de té con recetas artesanales y vista al jardín.',t:'Casa de té',img:'https://images.unsplash.com/photo-1559925393-8be0ec4767c8?w=400&q=80&fit=crop'},
+    {n:'Cervecería El Tronco',l:'San Martín de los Andes',d:'8 variedades propias, cocina de autor y ambiente de montaña.',t:'Cervecería',img:'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=400&q=80&fit=crop'},
+    {n:'Chocolate & Montaña',l:'San Martín de los Andes',d:'Chocolatería artesanal con café de especialidad.',t:'Chocolatería',img:'https://images.unsplash.com/photo-1481391319762-47dff72954d9?w=400&q=80&fit=crop'},
+    {n:'Restó Raíces',l:'San Martín de los Andes',d:'Cocina patagónica de autor con ingredientes de estación.',t:'Restaurante',img:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&q=80&fit=crop'},
+  ],
+  'Experiencias':[
+    {n:'Nieve Viva Ski School',l:'Chapelco',d:'Clases de ski y snowboard para todos los niveles.',t:'Ski',img:'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=400&q=80&fit=crop'},
+    {n:'Alquiler El Cerro',l:'Chapelco',d:'Ski, snowboard y bastones. Entrega en el cerro.',t:'Rental',img:'https://images.unsplash.com/photo-1547447134-cd3f5c716030?w=400&q=80&fit=crop'},
+    {n:'Trekking Sur',l:'San Martín de los Andes',d:'Caminatas guiadas con guía local certificado.',t:'Trekking',img:'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&q=80&fit=crop'},
+    {n:'Patagonia a Caballo',l:'San Martín de los Andes',d:'Cabalgatas por la cordillera con vista al lago.',t:'Cabalgata',img:'https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?w=400&q=80&fit=crop'},
+  ],
+  'Wellness':[
+    {n:'Spa Agua Fría',l:'San Martín de los Andes',d:'Masajes, sauna y tratamientos con ingredientes patagónicos.',t:'Spa',img:'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=400&q=80&fit=crop'},
+    {n:'Retiro del Bosque',l:'Lago Meliquina',d:'Yoga y meditación en plena naturaleza. Grupos pequeños.',t:'Retiro',img:'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&q=80&fit=crop'},
+  ],
+  'Comercios':[
+    {n:'Outdoor Patagonia',l:'San Martín de los Andes',d:'Ropa y equipamiento técnico para montaña y ski.',t:'Ropa outdoor',img:'https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=400&q=80&fit=crop'},
+    {n:'Artesanías del Sur',l:'San Martín de los Andes',d:'Tejidos en lana, cerámica y artesanías locales.',t:'Artesanías',img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80&fit=crop'},
+  ],
+  'Viajar sola':[
+    {n:'Cabaña del Alerce',l:'San Martín de los Andes',d:'Espacio verificado para mujeres viajeras. Anfitriona local.',t:'Cabaña',img:'https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?w=400&q=80&fit=crop'},
+    {n:'Hostería Viento Sur',l:'San Martín de los Andes',d:'Ambiente seguro, habitaciones individuales disponibles.',t:'Hostería',img:'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80&fit=crop'},
+  ],
+};
+
+function renderList(cat) {
+  const items = DATA[cat] || DATA['Alojamiento'];
+  document.getElementById('list-grid').innerHTML = items.map(item => `
+    <div class="lcard" onclick="nav('view-prof')">
+      <div class="lcard-img">
+        <img src="${item.img}" alt="${item.n}" loading="lazy">
+        <span class="lcard-badge">${item.t}</span>
+      </div>
+      <div class="lcard-body">
+        <div>
+          <div class="lcard-loc">${item.l}</div>
+          <div class="lcard-name">${item.n}</div>
+          <div class="lcard-desc">${item.d}</div>
+        </div>
+        <div class="lcard-foot">
+          <button class="fav" onclick="event.stopPropagation();toggleFav(this)">♡</button>
+          <a class="lcta">Ver y consultar →</a>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ══ SPLASH ══
+window.addEventListener('load', function() {
+  function playSound() {
+    try {
+      const ac = new (window.AudioContext || window.webkitAudioContext)();
+      const buf = ac.createBuffer(1, ac.sampleRate*5, ac.sampleRate);
+      const d = buf.getChannelData(0);
+      for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+      const src = ac.createBufferSource(); src.buffer=buf;
+      const f = ac.createBiquadFilter(); f.type='bandpass'; f.frequency.value=260; f.Q.value=0.22;
+      const g = ac.createGain();
+      g.gain.setValueAtTime(0,ac.currentTime);
+      g.gain.linearRampToValueAtTime(0.022,ac.currentTime+1.8);
+      g.gain.linearRampToValueAtTime(0.028,ac.currentTime+3.5);
+      g.gain.linearRampToValueAtTime(0,ac.currentTime+6.5);
+      src.connect(f); f.connect(g); g.connect(ac.destination);
+      src.start(); src.stop(ac.currentTime+7);
+      const o = ac.createOscillator(); const og = ac.createGain();
+      o.type='sine';
+      o.frequency.setValueAtTime(396,ac.currentTime+0.8);
+      o.frequency.linearRampToValueAtTime(660,ac.currentTime+4);
+      og.gain.setValueAtTime(0,ac.currentTime+0.8);
+      og.gain.linearRampToValueAtTime(0.018,ac.currentTime+2);
+      og.gain.linearRampToValueAtTime(0.024,ac.currentTime+4);
+      og.gain.linearRampToValueAtTime(0,ac.currentTime+6.5);
+      o.connect(og); og.connect(ac.destination);
+      o.start(ac.currentTime+0.8); o.stop(ac.currentTime+7);
+    } catch(e){}
+  }
+
+  const trySound = () => {
+    playSound();
+    document.removeEventListener('touchstart', trySound);
+    document.removeEventListener('click', trySound);
+  };
+  setTimeout(trySound, 350);
+  document.addEventListener('touchstart', trySound, {once:true});
+  document.addEventListener('click', trySound, {once:true});
+
+  const halo = document.getElementById('splash-halo');
+  const lw = document.getElementById('splash-logo-wrap');
+  const sl = document.getElementById('splash-slogan');
+  const sr = document.getElementById('splash-region');
+  const slo = document.getElementById('splash-loading');
+
+  // Halo
+  setTimeout(()=>{ if(halo) halo.style.opacity='1'; }, 300);
+  // Logo emerge con PRESENCIA
+  setTimeout(()=>{ if(lw) lw.classList.add('show'); }, 600);
+  // Slogan
+  setTimeout(()=>{ if(sl){ sl.style.opacity='1'; sl.style.transform='translateY(0)'; }}, 2000);
+  // Región
+  setTimeout(()=>{ if(sr){ sr.style.opacity='1'; sr.style.transform='translateY(0)'; }}, 2700);
+  // Cargando
+  setTimeout(()=>{ if(slo) slo.style.opacity='1'; }, 3300);
+  // Transición al hero
+  setTimeout(()=>{
+    const sp = document.getElementById('splash');
+    sp.style.opacity='0';
+    setTimeout(()=>{
+      sp.classList.remove('active'); sp.style.display='none';
+      document.getElementById('view-hero').classList.add('active');
+      curView='view-hero';
+    },1200);
+  }, 6200);
+});
+
+// ══ UTILS ══
+function toggleFav(btn){
+  btn.classList.toggle('on');
+  btn.textContent = btn.classList.contains('on') ? '♥' : '♡';
+  if(btn.classList.contains('on')) btn.style.color='var(--ember)';
+  else btn.style.color='';
+}
+
+function consultarFechas(){
+  const msg = encodeURIComponent('Hola 👋 Te escribo desde CONFÍN 🌿\nVi tu espacio Cabaña del Alerce.\n¿Tenés disponibilidad? ¿Me podés dar más información?');
+  window.open('https://wa.me/?text='+msg,'_blank');
+}
+
+function sharePerfil(){
+  if(navigator.share){ navigator.share({title:'Cabaña del Alerce — CONFÍN',url:window.location.href}); }
+  else{ navigator.clipboard.writeText(window.location.href).catch(()=>{}); showToast('Link copiado ✓'); }
+}
+
+function setTab(btn){
+  document.querySelectorAll('.gtab').forEach(t=>t.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+function setLang(btn){
+  btn.closest('.nav-r').querySelectorAll('.lbtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+function setFont(d){
+  fontSize = Math.max(13, Math.min(22, fontSize + d*2));
+  document.documentElement.style.fontSize = fontSize+'px';
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// Prevent background scroll
+document.body.addEventListener('touchmove', e=>{
+  if(!e.target.closest('.vscroll')) e.preventDefault();
+},{passive:false});
+</script>
+</body>
+</html>
